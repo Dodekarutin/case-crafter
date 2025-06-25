@@ -1,10 +1,11 @@
-import React, { useState } from 'react'
-import type { CreateProjectForm } from '../types'
+import React, { useState } from "react";
+import type { CreateProjectForm, FormErrors } from "../types";
+import { PROJECT_CATEGORIES } from "../types";
 
 interface ProjectCreateFormProps {
-  onSubmit: (formData: CreateProjectForm) => void
-  onCancel: () => void
-  nameInputRef?: React.RefObject<HTMLInputElement>
+  onSubmit: (formData: CreateProjectForm) => void;
+  onCancel: () => void;
+  nameInputRef?: React.RefObject<HTMLInputElement>;
 }
 
 export const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({
@@ -13,57 +14,62 @@ export const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({
   nameInputRef,
 }) => {
   const [formData, setFormData] = useState<CreateProjectForm>({
-    name: '',
-    description: '',
-    category: 'ITa',
-  })
-  const [errors, setErrors] = useState<{ name?: string }>({})
+    name: "",
+    description: "",
+    category: "ITa",
+  });
+  const [errors, setErrors] = useState<FormErrors>({});
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    
-    const newErrors: { name?: string } = {}
-    
+    e.preventDefault();
+
+    const newErrors: FormErrors = {};
+
     if (!formData.name.trim()) {
-      newErrors.name = 'プロジェクト名は必須です'
+      newErrors.name = "プロジェクト名は必須です";
     }
-    
-    setErrors(newErrors)
-    
+
+    setErrors(newErrors);
+
     if (Object.keys(newErrors).length === 0) {
-      onSubmit(formData)
+      onSubmit(formData);
       // フォームをクリア
       setFormData({
-        name: '',
-        description: '',
-        category: 'ITa',
-      })
-      setErrors({})
+        name: "",
+        description: "",
+        category: "ITa",
+      });
+      setErrors({});
     }
-  }
+  };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-    }))
-    
-    // エラーをクリア
-    if (errors[name as keyof typeof errors]) {
+    }));
+
+    // エラーをクリア（型安全なアクセス）
+    if (name in errors && errors[name as keyof FormErrors]) {
       setErrors((prev) => ({
         ...prev,
         [name]: undefined,
-      }))
+      }));
     }
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+        <label
+          htmlFor="name"
+          className="block text-sm font-medium text-gray-700 mb-1"
+        >
           プロジェクト名
         </label>
         <input
@@ -82,7 +88,10 @@ export const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({
       </div>
 
       <div>
-        <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+        <label
+          htmlFor="description"
+          className="block text-sm font-medium text-gray-700 mb-1"
+        >
           説明
         </label>
         <textarea
@@ -97,7 +106,10 @@ export const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({
       </div>
 
       <div>
-        <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
+        <label
+          htmlFor="category"
+          className="block text-sm font-medium text-gray-700 mb-1"
+        >
           カテゴリ
         </label>
         <select
@@ -107,10 +119,11 @@ export const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({
           onChange={handleChange}
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         >
-          <option value="ITa">ITa</option>
-          <option value="ITb">ITb</option>
-          <option value="統合テスト">統合テスト</option>
-          <option value="その他">その他</option>
+          {PROJECT_CATEGORIES.map((category) => (
+            <option key={category} value={category}>
+              {category}
+            </option>
+          ))}
         </select>
       </div>
 
@@ -130,5 +143,5 @@ export const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({
         </button>
       </div>
     </form>
-  )
-}
+  );
+};

@@ -97,6 +97,57 @@ describe("ProjectStore", () => {
 
       expect(result.current.projects).toHaveLength(0);
     });
+
+    test("現在のプロジェクトを削除するとcurrentProjectがnullになる", () => {
+      const { result } = renderHook(() => useProjectStore());
+
+      act(() => {
+        result.current.addProject(mockProject);
+      });
+
+      const project = result.current.projects[0];
+
+      // プロジェクトを現在のプロジェクトに設定
+      act(() => {
+        result.current.setCurrentProject(project);
+      });
+
+      expect(result.current.currentProject).toBe(project);
+
+      // そのプロジェクトを削除
+      act(() => {
+        result.current.deleteProject(project.id);
+      });
+
+      // currentProjectがnullになることを確認
+      expect(result.current.currentProject).toBeNull();
+      expect(result.current.projects).toHaveLength(0);
+    });
+
+    test("現在のプロジェクト以外を削除してもcurrentProjectは変わらない", () => {
+      const { result } = renderHook(() => useProjectStore());
+
+      act(() => {
+        result.current.addProject(mockProject);
+        result.current.addProject({ ...mockProject, name: "別のプロジェクト" });
+      });
+
+      const [firstProject, secondProject] = result.current.projects;
+
+      // 最初のプロジェクトを現在のプロジェクトに設定
+      act(() => {
+        result.current.setCurrentProject(firstProject);
+      });
+
+      // 2番目のプロジェクトを削除
+      act(() => {
+        result.current.deleteProject(secondProject.id);
+      });
+
+      // currentProjectは変わらないことを確認
+      expect(result.current.currentProject).toBe(firstProject);
+      expect(result.current.projects).toHaveLength(1);
+    });
   });
 
   describe("setCurrentProject", () => {
