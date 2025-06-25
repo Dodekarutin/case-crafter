@@ -4,7 +4,7 @@ export interface Project {
   id: string;
   name: string;
   description?: string;
-  category: "ITa" | "ITb" | "統合テスト" | "その他";
+  category: ProjectCategory;
   createdAt: string;
   updatedAt: string;
   testCases: TestCase[];
