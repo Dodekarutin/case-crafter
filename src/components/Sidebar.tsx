@@ -1,13 +1,27 @@
-import React from 'react'
-import { FolderOpen, Plus, Search, Filter } from 'lucide-react'
+import React, { useState } from 'react'
+import { FolderOpen, Plus, Search } from 'lucide-react'
+import { ProjectCreateModal } from './ProjectCreateModal'
+import { useProjectStore } from '../stores/projectStore'
+import type { CreateProjectForm } from '../types'
 
 export const Sidebar: React.FC = () => {
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const { projects, addProject } = useProjectStore()
+
+  const handleCreateProject = (formData: CreateProjectForm) => {
+    addProject(formData)
+  }
+
   return (
     <aside className="w-64 bg-white border-r border-gray-200 h-screen">
       <div className="p-4">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-gray-900">プロジェクト</h2>
-          <button className="p-1 text-gray-500 hover:text-gray-700">
+          <button 
+            className="p-1 text-gray-500 hover:text-gray-700"
+            onClick={() => setIsModalOpen(true)}
+            aria-label="新規プロジェクト作成"
+          >
             <Plus className="h-5 w-5" />
           </button>
         </div>
@@ -24,41 +38,32 @@ export const Sidebar: React.FC = () => {
         </div>
         
         <div className="space-y-2">
-          <div className="flex items-center justify-between p-2 text-sm text-gray-700 bg-blue-50 rounded-md">
-            <div className="flex items-center">
-              <FolderOpen className="h-4 w-4 mr-2 text-blue-600" />
-              現在のプロジェクト
+          {projects.length > 0 ? (
+            projects.map((project) => (
+              <div key={project.id} className="flex items-center justify-between p-2 text-sm text-gray-700 hover:bg-blue-50 rounded-md cursor-pointer">
+                <div className="flex items-center">
+                  <FolderOpen className="h-4 w-4 mr-2 text-blue-600" />
+                  {project.name}
+                </div>
+                <span className="text-xs text-gray-500">
+                  ({project.testCases.length}件)
+                </span>
+              </div>
+            ))
+          ) : (
+            <div className="text-sm text-gray-500 text-center py-4">
+              プロジェクトがありません<br />
+              ＋ボタンから作成してください
             </div>
-            <Filter className="h-4 w-4 text-gray-400" />
-          </div>
-          
-          <div className="ml-6 space-y-1">
-            <div className="p-2 text-sm text-gray-600 hover:bg-gray-50 rounded cursor-pointer">
-              ITa テスト (5件)
-            </div>
-            <div className="p-2 text-sm text-gray-600 hover:bg-gray-50 rounded cursor-pointer">
-              ITb テスト (3件)
-            </div>
-            <div className="p-2 text-sm text-gray-600 hover:bg-gray-50 rounded cursor-pointer">
-              統合テスト (8件)
-            </div>
-          </div>
-        </div>
-        
-        <div className="mt-6 pt-4 border-t border-gray-200">
-          <h3 className="text-sm font-medium text-gray-900 mb-2">最近のプロジェクト</h3>
-          <div className="space-y-1">
-            <div className="flex items-center p-2 text-sm text-gray-600 hover:bg-gray-50 rounded cursor-pointer">
-              <FolderOpen className="h-4 w-4 mr-2 text-gray-400" />
-              ログイン機能テスト
-            </div>
-            <div className="flex items-center p-2 text-sm text-gray-600 hover:bg-gray-50 rounded cursor-pointer">
-              <FolderOpen className="h-4 w-4 mr-2 text-gray-400" />
-              API連携テスト
-            </div>
-          </div>
+          )}
         </div>
       </div>
+
+      <ProjectCreateModal
+        isOpen={isModalOpen}
+        onSubmit={handleCreateProject}
+        onClose={() => setIsModalOpen(false)}
+      />
     </aside>
   )
 }
