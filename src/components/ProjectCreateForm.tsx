@@ -5,7 +5,7 @@ import { PROJECT_CATEGORIES } from "../types";
 interface ProjectCreateFormProps {
   onSubmit: (formData: CreateProjectForm) => void;
   onCancel: () => void;
-  nameInputRef?: React.RefObject<HTMLInputElement>;
+  nameInputRef?: React.RefObject<HTMLInputElement | null>;
 }
 
 export const ProjectCreateForm: React.FC<ProjectCreateFormProps> = ({
